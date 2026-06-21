@@ -1,0 +1,23 @@
+# ============================================================
+#  requirements.txt — Acakehan Backend
+#  Cara install: pip install -r requirements.txt
+# ============================================================
+
+# Framework utama
+Flask==3.0.3
+
+# ORM Database (MySQL / PostgreSQL)
+Flask-SQLAlchemy==3.1.1
+PyMySQL==1.1.1              # Driver MySQL
+cryptography==42.0.8        # Dependensi PyMySQL untuk koneksi aman
+
+# Autentikasi & Keamanan
+Flask-Bcrypt==1.0.1         # Hashing kata sandi dengan bcrypt
+PyJWT==2.8.0                # Generate & validasi token JWT
+Flask-JWT-Extended==4.6.0  # Helper JWT untuk Flask
+
+# Validasi & Utilitas
+python-dotenv==1.0.1        # Membaca file .env ke environment variable
+
+# Untuk pengembangan (opsional)
+flask-shell-ipython==0.5.1  # Shell Flask interaktif

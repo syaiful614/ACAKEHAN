@@ -1,0 +1,33 @@
+# ============================================================
+#  requirements.txt — Acakehan Backend (FastAPI)
+#  Install: pip install -r requirements.txt
+# ============================================================
+
+# Framework utama
+fastapi==0.111.0
+uvicorn[standard]==0.29.0       # ASGI server produksi
+
+# Database ORM
+sqlalchemy==2.0.30              # ORM modern dengan async support
+alembic==1.13.1                 # Migrasi database
+pymysql==1.1.1                  # Driver MySQL
+cryptography==42.0.8            # Enkripsi koneksi MySQL
+
+# Validasi & Serialisasi
+pydantic==2.7.1                 # Validasi data otomatis (bawaan FastAPI)
+pydantic-settings==2.2.1        # Konfigurasi dari .env
+email-validator==2.1.1          # Validasi format email
+
+# Autentikasi & Keamanan
+passlib[bcrypt]==1.7.4          # Hashing kata sandi bcrypt
+python-jose[cryptography]==3.3.0 # Generate & validasi token JWT
+python-multipart==0.0.9         # Parsing form-data
+
+# Utilitas
+python-dotenv==1.0.1            # Baca file .env
+pytz==2024.1                    # Timezone Indonesia (WIB)
+
+# Development tools (opsional)
+httpx==0.27.0                   # HTTP client untuk testing endpoint
+pytest==8.2.1                   # Framework testing
+pytest-asyncio==0.23.7          # Testing async

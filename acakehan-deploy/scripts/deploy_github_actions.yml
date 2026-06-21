@@ -1,0 +1,112 @@
+name: 🚀 Deploy Acakehan Backend ke VPS
+
+# ── Trigger: Jalankan setiap push ke branch main ────────────────
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # Bisa dijalankan manual dari GitHub UI
+
+# ── Variabel environment global ────────────────────────────────
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ============================================================
+  #  JOB 1: Uji Kode (Lint + Test)
+  #  Berjalan di GitHub Actions runner (bukan VPS)
+  # ============================================================
+  uji-kode:
+    name: 🧪 Uji & Validasi Kode
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependensi
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 pytest httpx
+
+      - name: Lint kode (flake8)
+        run: |
+          flake8 app/ --max-line-length=120 \
+            --exclude=__pycache__,.venv,venv \
+            --ignore=E501,W503
+        continue-on-error: true  # Jangan gagalkan pipeline hanya karena lint
+
+      - name: Validasi import semua modul
+        run: |
+          python -c "
+          from app.config.pengaturan import ambilPengaturan
+          from app.models.model_db import Pengguna, Transaksi, Anggaran
+          from app.schemas.skema_data import SkemaRegistrasi, SkemaTambahTransaksi
+          print('Semua import berhasil divalidasi.')
+          "
+        env:
+          DB_HOST:       localhost
+          DB_KATA_SANDI: test
+          JWT_KUNCI_RAHASIA: test-secret-key-for-ci-only
+
+  # ============================================================
+  #  JOB 2: Deploy ke VPS
+  #  Berjalan setelah job uji-kode berhasil
+  # ============================================================
+  deploy-ke-vps:
+    name: 🚀 Deploy ke VPS Production
+    runs-on: ubuntu-22.04
+    needs: uji-kode   # Tunggu job uji-kode selesai dulu
+    if: github.ref == 'refs/heads/main'   # Hanya dari branch main
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          # SSH_PRIVATE_KEY: tambahkan di GitHub → Settings → Secrets → Actions
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Tambahkan VPS ke known hosts
+        run: |
+          mkdir -p ~/.ssh
+          # VPS_HOST: tambahkan di GitHub Secrets
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy ke VPS via SSH
+        run: |
+          ssh acakehan@${{ secrets.VPS_HOST }} << 'PERINTAH_REMOTE'
+            set -e
+            cd ~/acakehan-backend
+            echo "=== Pull kode terbaru ==="
+            git pull origin main
+            echo "=== Update dependensi ==="
+            venv/bin/pip install -r requirements.txt -q
+            echo "=== Restart service ==="
+            sudo systemctl restart acakehan-api
+            sleep 3
+            echo "=== Verifikasi ==="
+            curl -sf http://127.0.0.1:8000/api/v1/status || exit 1
+            echo "Deploy berhasil!"
+          PERINTAH_REMOTE
+
+      - name: Kirim notifikasi sukses
+        if: success()
+        run: |
+          echo "✅ Deploy ke production berhasil!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          # Tambahkan notifikasi Telegram/Slack/Discord di sini
+
+      - name: Kirim notifikasi gagal
+        if: failure()
+        run: |
+          echo "❌ Deploy GAGAL! Periksa log GitHub Actions."

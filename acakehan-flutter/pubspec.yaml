@@ -1,0 +1,83 @@
+name: acakehan
+description: Aplikasi Catatan Keuangan Harian — Acakehan
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ── State Management ──────────────────────────────────────
+  flutter_riverpod: ^2.5.1       # State management modern & type-safe
+  riverpod_annotation: ^2.3.5
+
+  # ── HTTP & Jaringan ───────────────────────────────────────
+  dio: ^5.4.3                    # HTTP client dengan interceptor & logging
+  pretty_dio_logger: ^1.3.1      # Log request/response di console (dev)
+
+  # ── Penyimpanan Lokal ─────────────────────────────────────
+  flutter_secure_storage: ^9.0.0 # Simpan token JWT dengan aman (Keychain/Keystore)
+  shared_preferences: ^2.2.3     # Data preferensi ringan (tema, dll.)
+
+  # ── Serialisasi Data ──────────────────────────────────────
+  freezed_annotation: ^2.4.1     # Immutable model dengan copyWith
+  json_annotation: ^4.9.0        # Anotasi untuk json_serializable
+
+  # ── Navigasi ─────────────────────────────────────────────
+  go_router: ^13.2.1             # Deklaratif routing dengan deep link
+
+  # ── Grafik & Visualisasi ──────────────────────────────────
+  fl_chart: ^0.68.0              # Grafik pie & line chart untuk dashboard
+
+  # ── Utilitas UI ───────────────────────────────────────────
+  intl: 0.20.2                  # Format angka & tanggal (Rupiah, tanggal ID)
+  shimmer: ^3.0.0                # Skeleton loading animation
+  gap: ^3.0.1                    # Widget jarak yang lebih semantik
+  flutter_animate: ^4.5.0        # Animasi deklaratif yang ekspresif
+  lucide_icons: 0.257.0           # Ikon modern & konsisten
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # ── Code Generation ───────────────────────────────────────
+  build_runner: ^2.4.9
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.0
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-ExtraBold.ttf
+          weight: 800
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora-Regular.ttf
+        - asset: assets/fonts/Sora-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Sora-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Sora-Bold.ttf
+          weight: 700
+
+  assets:
+    - assets/images/
