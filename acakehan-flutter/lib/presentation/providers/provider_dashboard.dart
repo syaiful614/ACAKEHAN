@@ -52,7 +52,8 @@ class StateTransaksi {
     int? halamanSaat,
     int? totalHalaman,
     String? filterTipe,
-    bool hapusError = false,
+    bool hapusError  = false,
+    bool hapusFilter = false,   // FIX: flag untuk reset filterTipe ke null
   }) {
     return StateTransaksi(
       daftarTransaksi:  daftarTransaksi  ?? this.daftarTransaksi,
@@ -61,7 +62,8 @@ class StateTransaksi {
       pesanError:       hapusError ? null : (pesanError ?? this.pesanError),
       halamanSaat:      halamanSaat      ?? this.halamanSaat,
       totalHalaman:     totalHalaman     ?? this.totalHalaman,
-      filterTipe:       filterTipe       ?? this.filterTipe,
+      // FIX: hapusFilter=true → paksa reset ke null, agar filter "Semua" benar-benar hapus filter
+      filterTipe:       hapusFilter ? null : (filterTipe ?? this.filterTipe),
     );
   }
 }
@@ -75,7 +77,7 @@ class NotifierTransaksi extends StateNotifier<StateTransaksi> {
 
   /// Muat ulang dari awal (refresh).
   Future<void> muatTransaksi({String? tipe}) async {
-    state = state.salin(sedangMemuat: true, hapusError: true, filterTipe: tipe);
+    state = state.salin(sedangMemuat: true, hapusError: true, filterTipe: tipe, hapusFilter: tipe == null);
     try {
       final hasil = await _repositori.ambilDaftarTransaksi(
         tipe:    tipe,

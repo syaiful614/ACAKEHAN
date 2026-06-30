@@ -307,9 +307,12 @@ def _ambilStatusAnggaran(
         persen       = round((terpakai / batas * 100), 2) if batas > 0 else 0.0
         sisa         = max(0.0, batas - terpakai)
         namaKategori = ang.kategori.namaKategori if ang.kategori else "?"
+        # FIX: sertakan ikon kategori untuk ditampilkan di UI Flutter
+        ikonKategori = ang.kategori.ikonKategori if ang.kategori else None
 
         daftarStatus.append(SkemaStatusAnggaran(
             namaKategori   = namaKategori,
+            ikonKategori   = ikonKategori,
             batasMaksimal  = batas,
             totalTerpakai  = terpakai,
             persenTerpakai = persen,

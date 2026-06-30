@@ -312,3 +312,27 @@ def keluarAkun():
         pesan    = f"Berhasil keluar. Sampai jumpa, {namaPengguna}! "
                    "Hapus token dari penyimpanan lokal perangkat Anda."
     )
+
+# ============================================================
+#  ENDPOINT: GET /api/auth/profil
+#  Fungsi  : Ambil data profil pengguna yang sedang login
+#  FIX     : Endpoint ini belum ada, ditambahkan agar Flutter
+#             bisa mengambil data profil pengguna
+# ============================================================
+@routerAutentikasi.route("/profil", methods=["GET"])
+@wajib_login
+def profilPengguna():
+    """
+    Mengembalikan data profil pengguna yang sedang login.
+
+    Header wajib:
+        Authorization: Bearer <tokenAkses>
+    """
+    pengguna = g.pengguna_aktif
+    return buatResponAPI(
+        berhasil = True,
+        pesan    = f"Data profil {pengguna.namaLengkap} berhasil diambil.",
+        data     = {
+            "pengguna": pengguna.ke_dict()
+        }
+    )

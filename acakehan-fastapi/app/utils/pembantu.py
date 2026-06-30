@@ -24,32 +24,14 @@ konteksBcrypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 #  BCRYPT: Hash & Verifikasi Kata Sandi
 # ============================================================
 def hashKataSandi(kataSandiPolos: str) -> str:
-    """
-    Menghasilkan hash bcrypt dari kata sandi yang diberikan.
-    Bcrypt secara otomatis menambahkan salt acak — setiap hash unik
-    meskipun kata sandinya sama.
-
-    Args:
-        kataSandiPolos: Kata sandi asli sebelum di-hash
-
-    Returns:
-        String hash bcrypt, contoh: "$2b$12$..."
-    """
+    # FIX: bcrypt v4+ tidak menerima password > 72 bytes, truncate manual
+    kataSandiPolos = kataSandiPolos[:72]
     return konteksBcrypt.hash(kataSandiPolos)
 
 
 def verifikasiKataSandi(kataSandiPolos: str, hashTersimpan: str) -> bool:
-    """
-    Membandingkan kata sandi polos dengan hash yang tersimpan di DB.
-    AMAN terhadap timing attack karena menggunakan perbandingan konstan.
-
-    Args:
-        kataSandiPolos : Kata sandi yang diinput pengguna saat login
-        hashTersimpan  : Hash bcrypt dari database
-
-    Returns:
-        True jika cocok, False jika tidak
-    """
+    # FIX: truncate juga saat verifikasi agar konsisten
+    kataSandiPolos = kataSandiPolos[:72]
     return konteksBcrypt.verify(kataSandiPolos, hashTersimpan)
 
 

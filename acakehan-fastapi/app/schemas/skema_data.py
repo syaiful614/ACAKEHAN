@@ -285,6 +285,7 @@ class SkemaTrenBulanan(BaseModel):
 class SkemaStatusAnggaran(BaseModel):
     """Status semua anggaran aktif pengguna di bulan ini."""
     namaKategori:   str
+    ikonKategori:   Optional[str] = None   # FIX: tambah ikon kategori untuk tampilan UI
     batasMaksimal:  float
     totalTerpakai:  float
     persenTerpakai: float

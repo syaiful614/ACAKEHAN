@@ -124,4 +124,21 @@ class FormatHelper {
   static String labelPeriode(int bulan, int tahun) {
     return '${namaBulan(bulan)} $tahun';
   }
+
+  // ── Method tambahan yang dibutuhkan halaman profil & anggaran ──
+
+  /// Format DateTime? ke string tanggal lengkap (null-safe)
+  static String formatTanggal(DateTime? tgl) {
+    if (tgl == null) return '-';
+    return tanggalLengkap(tgl);
+  }
+
+  /// Alias rupiah() untuk kompatibilitas widget
+  static String formatRupiah(num nominal) => rupiah(nominal);
+
+  /// Label bulan saat ini, contoh: "Juni 2026"
+  static String labelBulanIni() {
+    final now = DateTime.now();
+    return bulanTahun(now);
+  }
 }

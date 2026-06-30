@@ -274,15 +274,17 @@ class ModelTrenBulanan {
 //  MODEL: Status Anggaran
 // ============================================================
 class ModelStatusAnggaran {
-  final String namaKategori;
-  final double batasMaksimal;
-  final double totalTerpakai;
-  final double persenTerpakai;
-  final double sisaAnggaran;
-  final bool   statusAman;
+  final String  namaKategori;
+  final String? ikonKategori;   // FIX: tambah ikon kategori dari API
+  final double  batasMaksimal;
+  final double  totalTerpakai;
+  final double  persenTerpakai;
+  final double  sisaAnggaran;
+  final bool    statusAman;
 
   const ModelStatusAnggaran({
     required this.namaKategori,
+    this.ikonKategori,
     required this.batasMaksimal,
     required this.totalTerpakai,
     required this.persenTerpakai,
@@ -292,12 +294,13 @@ class ModelStatusAnggaran {
 
   factory ModelStatusAnggaran.dariJson(Map<String, dynamic> json) {
     return ModelStatusAnggaran(
-      namaKategori:   json['namaKategori']   as String,
+      namaKategori:   json['namaKategori']    as String,
+      ikonKategori:   json['ikonKategori']    as String?,   // FIX
       batasMaksimal:  (json['batasMaksimal']  as num).toDouble(),
       totalTerpakai:  (json['totalTerpakai']  as num).toDouble(),
       persenTerpakai: (json['persenTerpakai'] as num).toDouble(),
       sisaAnggaran:   (json['sisaAnggaran']   as num).toDouble(),
-      statusAman:     json['statusAman']     as bool,
+      statusAman:     json['statusAman']      as bool,
     );
   }
 }

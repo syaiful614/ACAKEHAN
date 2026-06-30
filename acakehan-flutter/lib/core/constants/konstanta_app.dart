@@ -12,7 +12,7 @@ class KonstantaApi {
   /// Ganti dengan IP/domain server backend saat production.R
   /// Untuk emulator Android gunakan 10.0.2.2 (bukan localhost).
   /// Untuk simulator iOS / web gunakan localhost.
-  static const String urlDasar = 'http://10.200.210.96:8000/api/v1';
+  static const String urlDasar = 'http://10.175.139.96:8000/api/v1';
 
   // ── Endpoint Autentikasi ──────────────────────────────────
   static const String daftar  = '/auth/daftar';

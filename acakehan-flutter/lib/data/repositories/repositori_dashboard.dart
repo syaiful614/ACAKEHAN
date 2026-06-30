@@ -3,6 +3,8 @@
 //  File   : lib/data/repositories/repositori_dashboard.dart
 //  Fungsi : Repository dashboard & transaksi — mengambil data
 //           dari API backend dan memetakannya ke model lokal.
+//  FIX    : Perbaikan parsing response pagination yang salah
+//           (pagination berada di root response, bukan di dalam 'data')
 // ============================================================
 
 import 'package:dio/dio.dart';
@@ -33,6 +35,8 @@ class RepositoriTransaksi {
   const RepositoriTransaksi({required Dio klien}) : _klien = klien;
 
   /// Ambil riwayat transaksi dengan filter opsional & pagination.
+  /// FIX: FastAPI mengembalikan 'data' sebagai List langsung dan
+  ///      'pagination' di level root response (bukan di dalam 'data').
   Future<Map<String, dynamic>> ambilDaftarTransaksi({
     String? tipe,
     int?    bulan,
@@ -43,7 +47,7 @@ class RepositoriTransaksi {
   }) async {
     try {
       final queryParam = <String, dynamic>{
-        'halaman':    halaman,
+        'halaman':     halaman,
         'per_halaman': perHalaman,
         if (tipe       != null) 'tipe':        tipe,
         if (bulan      != null) 'bulan':       bulan,
@@ -56,6 +60,9 @@ class RepositoriTransaksi {
         queryParameters: queryParam,
       );
 
+      // FIX: FastAPI mengembalikan struktur:
+      // { "berhasil": true, "data": [...], "pagination": {...} }
+      // bukan { "berhasil": true, "data": { "transaksi": [...], "pagination": {...} } }
       final daftarJson = respons.data['data'] as List;
       final paginasi   = respons.data['pagination'] as Map<String, dynamic>;
 
@@ -63,9 +70,9 @@ class RepositoriTransaksi {
         'transaksi': daftarJson
             .map((e) => ModelTransaksi.dariJson(e as Map<String, dynamic>))
             .toList(),
-        'totalData':   paginasi['totalData'],
-        'totalHalaman': paginasi['totalHalaman'],
-        'halamanSaat': paginasi['halaman'],
+        'totalData':    paginasi['totalData']    ?? 0,
+        'totalHalaman': paginasi['totalHalaman'] ?? 1,
+        'halamanSaat':  paginasi['halaman']      ?? 1,
       };
     } on DioException catch (galat) {
       throw Exception(PenguraiGalatApi.uraikan(galat));
@@ -73,6 +80,7 @@ class RepositoriTransaksi {
   }
 
   /// Catat transaksi baru dan kembalikan hasilnya.
+  /// FIX: Response FastAPI: { "data": { "transaksi": {...}, "anggaran": {...} } }
   Future<ModelTransaksi> tambahTransaksi({
     required int    kategoriId,
     required double jumlahNominal,
@@ -91,6 +99,7 @@ class RepositoriTransaksi {
           if (catatanTambahan != null) 'catatanTambahan': catatanTambahan,
         },
       );
+      // FIX: data transaksi ada di dalam 'data' → 'transaksi'
       final data = respons.data['data']['transaksi'] as Map<String, dynamic>;
       return ModelTransaksi.dariJson(data);
     } on DioException catch (galat) {
@@ -98,7 +107,7 @@ class RepositoriTransaksi {
     }
   }
 
-  /// Hapus lunak transaksi berdasarkan ID.
+  /// Hapus transaksi berdasarkan ID.
   Future<void> hapusTransaksi(int transaksiId) async {
     try {
       await _klien.delete(KonstantaApi.transaksiById(transaksiId));
@@ -112,14 +121,13 @@ class RepositoriKategori {
   final Dio _klien;
   const RepositoriKategori({required Dio klien}) : _klien = klien;
 
-  /// Ambil daftar kategori yang bisa digunakan pengguna (global + custom miliknya).
+  /// Ambil daftar kategori, filter opsional berdasarkan tipe.
+  /// FIX: Response FastAPI: { "data": [...] } — 'data' adalah List langsung
   Future<List<ModelKategori>> ambilDaftarKategori({String? tipe}) async {
     try {
       final respons = await _klien.get(
         KonstantaApi.kategori,
-        queryParameters: {
-          if (tipe != null) 'tipe': tipe,
-        },
+        queryParameters: tipe != null ? {'tipe': tipe} : null,
       );
       final daftarJson = respons.data['data'] as List;
       return daftarJson
